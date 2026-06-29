@@ -1,43 +1,208 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
-
-<title>Library</title>
-
-<link rel="stylesheet" href="css/style.css">
-
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Petal Pages</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 
 <body>
-<div class="container">
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">📖</span>
+        <div>
+          <h1>Petal Pages</h1>
+          <p>Every story deserves a home.</p>
+        </div>
+      </div>
 
-    <div class="logo">
+      <div class="search-card" id="searchCard">
+        <label for="searchInput">Search library</label>
+        <div class="search-field">
+          <input id="searchInput" type="search" placeholder="Find your next read" />
+          <button id="searchButton" type="button" aria-label="Search">🔍</button>
+        </div>
+      </div>
+    </header>
 
-        📚
+    <main class="library-view">
+      <section class="shelf" aria-label="Top shelf">
+        <div class="shelf-edge"></div>
+        <div class="shelf-row">
+          <button class="book" type="button" data-book-id="summer-bloom" data-title="Summer Bloom" data-author="Lila Hart" data-summary="A gentle story of a garden in bloom, warmth, and friendships that blossom during quiet afternoons.">
+            <span class="book-shell">
+              <span class="book-spine"></span>
+              <span class="book-cover book-cover--peach">
+                <span class="bookmark"></span>
+                <span class="cover-mark">Petal</span>
+              </span>
+            </span>
+            <span class="book-label">
+              <strong>Summer Bloom</strong>
+              <span>Lila Hart</span>
+            </span>
+          </button>
+          <button class="book" type="button" data-book-id="willow-ink" data-title="Willow & Ink" data-author="June Alder" data-summary="A warm hardcover tale of memory, inked letters, and the gentle rhythm of small town afternoons.">
+            <span class="book-shell">
+              <span class="book-spine"></span>
+              <span class="book-cover book-cover--sage">
+                <span class="bookmark"></span>
+                <span class="cover-mark">Willow</span>
+              </span>
+            </span>
+            <span class="book-label">
+              <strong>Willow & Ink</strong>
+              <span>June Alder</span>
+            </span>
+          </button>
+          <button class="book" type="button" data-book-id="midnight-orchard" data-title="Midnight Orchard" data-author="Elise Rowan" data-summary="A dreamy hardcover escape into moonlit orchards where pages turn like leaves and the world feels hushed.">
+            <span class="book-shell">
+              <span class="book-spine"></span>
+              <span class="book-cover book-cover--rose">
+                <span class="bookmark"></span>
+                <span class="cover-mark">Midnight</span>
+              </span>
+            </span>
+            <span class="book-label">
+              <strong>Midnight Orchard</strong>
+              <span>Elise Rowan</span>
+            </span>
+          </button>
+          <button class="book" type="button" data-book-id="gentle-pages" data-title="Gentle Pages" data-author="Mae Rivers" data-summary="A cozy hardcover collection of simple moments, warm tea, and pages soft enough to soothe the busiest mind.">
+            <span class="book-shell">
+              <span class="book-spine"></span>
+              <span class="book-cover book-cover--cocoa">
+                <span class="bookmark"></span>
+                <span class="cover-mark">Gentle</span>
+              </span>
+            </span>
+            <span class="book-label">
+              <strong>Gentle Pages</strong>
+              <span>Mae Rivers</span>
+            </span>
+          </button>
+        </div>
+      </section>
 
+      <section class="shelf" aria-label="Bottom shelf">
+        <div class="shelf-edge"></div>
+        <div class="shelf-row">
+          <button class="book" type="button" data-book-id="petal-harvest" data-title="Petal Harvest" data-author="Aria Bloom" data-summary="A hardcover seasonal story wrapped in petal-soft prose and warm candlelit pages.">
+            <span class="book-shell">
+              <span class="book-spine"></span>
+              <span class="book-cover book-cover--blush">
+                <span class="bookmark"></span>
+                <span class="cover-mark">Harvest</span>
+              </span>
+            </span>
+            <span class="book-label">
+              <strong>Petal Harvest</strong>
+              <span>Aria Bloom</span>
+            </span>
+          </button>
+          <button class="book" type="button" data-book-id="honeyed-stories" data-title="Honeyed Stories" data-author="Nova Clay" data-summary="A hardcover anthology of honeyed memories, warm voices, and quiet evenings under soft lamplight.">
+            <span class="book-shell">
+              <span class="book-spine"></span>
+              <span class="book-cover book-cover--terra">
+                <span class="bookmark"></span>
+                <span class="cover-mark">Honeyed</span>
+              </span>
+            </span>
+            <span class="book-label">
+              <strong>Honeyed Stories</strong>
+              <span>Nova Clay</span>
+            </span>
+          </button>
+          <button class="book" type="button" data-book-id="rosewood-trails" data-title="Rosewood Trails" data-author="Elodie Shaw" data-summary="A hardcover journey through rosewood forests, lantern-lit paths, and quiet conversations beneath the stars.">
+            <span class="book-shell">
+              <span class="book-spine"></span>
+              <span class="book-cover book-cover--mauve">
+                <span class="bookmark"></span>
+                <span class="cover-mark">Rosewood</span>
+              </span>
+            </span>
+            <span class="book-label">
+              <strong>Rosewood Trails</strong>
+              <span>Elodie Shaw</span>
+            </span>
+          </button>
+          <button class="book" type="button" data-book-id="soft-linen" data-title="Soft Linen" data-author="June Vale" data-summary="A polished hardcover tale of linen-soft afternoons, intentional pauses, and the comfort of a trusted story.">
+            <span class="book-shell">
+              <span class="book-spine"></span>
+              <span class="book-cover book-cover--coffee">
+                <span class="bookmark"></span>
+                <span class="cover-mark">Linen</span>
+              </span>
+            </span>
+            <span class="book-label">
+              <strong>Soft Linen</strong>
+              <span>June Vale</span>
+            </span>
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <div class="reader-overlay" id="readerOverlay" aria-hidden="true">
+      <div class="reader-card" role="dialog" aria-modal="true">
+        <button class="back-button" id="backButton" type="button">← Back to shelf</button>
+        <div class="reader-header">
+          <span class="reader-tag">Reading</span>
+          <h2 id="readerTitle">Summer Bloom</h2>
+          <p id="readerAuthor">Lila Hart</p>
+        </div>
+
+        <div class="reader-detail" id="detailView">
+          <div class="reader-cover-copy">
+            <div class="detail-cover-shell">
+              <span class="detail-cover" id="detailCover" aria-hidden="true"></span>
+            </div>
+            <div class="detail-copy">
+              <p class="book-synopsis" id="readerSynopsis"></p>
+              <button class="start-reading" id="startReadingButton" type="button">Start Reading</button>
+            </div>
+          </div>
+
+          <div class="chapter-panel">
+            <div class="chapter-panel-heading">
+              <p class="chapter-panel-label">Chapters</p>
+              <span class="resume-label" id="resumeLabel"></span>
+            </div>
+            <div class="chapter-list" id="chapterList"></div>
+          </div>
+        </div>
+
+        <div class="reader-book hidden" id="readerView" aria-hidden="true">
+          <div class="reader-state">
+            <div>
+              <p class="chapter-label">Chapter</p>
+              <strong id="chapterTitle">Dawn on the Garden</strong>
+            </div>
+            <div class="page-meta">
+              <span id="pageCounter">Page 1 of 2</span>
+              <progress id="bookProgress" value="0" max="100"></progress>
+            </div>
+          </div>
+
+          <div class="reader-story" id="readerText" tabindex="-1">
+            <p>A cozy page of the story appears here.</p>
+          </div>
+
+          <div class="reader-footer">
+            <button class="reader-nav" id="prevPageButton" type="button">Previous</button>
+            <button class="reader-nav primary" id="nextPageButton" type="button">Next page</button>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <h1>Our Little Library</h1>
+    <div class="feedback-banner" id="feedbackBanner" aria-live="polite"></div>
+  </div>
 
-    <p>Every story deserves a safe place.</p>
-
-    <button id="enterBtn">
-
-        Enter
-
-    </button>
-
-</div>
-
+  <script src="js/script.js"></script>
 </body>
-
-<script src="js/script.js"></script>
 
 </html>
