@@ -29,6 +29,12 @@
     </header>
 
     <main class="library-view">
+      <div class="library-section-heading">
+        <div>
+          <p class="eyebrow">Your collection</p>
+          <h2>Built-in Library</h2>
+        </div>
+      </div>
       <section class="shelf" aria-label="Top shelf">
         <div class="shelf-edge"></div>
         <div class="shelf-row">
@@ -144,6 +150,20 @@
           </button>
         </div>
       </section>
+
+      <div class="library-section-heading my-library-heading">
+        <div>
+          <p class="eyebrow">Personal collection</p>
+          <h2>My Library</h2>
+        </div>
+        <button class="start-reading add-to-shelf" id="addToShelfButton" type="button">Add To Shelf</button>
+        <input class="visually-hidden" id="bookFileInput" type="file" accept=".epub,.pdf,.txt,application/epub+zip,application/pdf,text/plain" multiple />
+      </div>
+      <section class="shelf my-library-shelf" id="myLibraryShelf" aria-label="My Library">
+        <div class="shelf-edge"></div>
+        <div class="shelf-row" id="myLibraryBooks"></div>
+        <p class="empty-shelf" id="emptyShelfMessage">Your own books will rest here.</p>
+      </section>
     </main>
 
     <div class="reader-overlay" id="readerOverlay" aria-hidden="true">
@@ -180,15 +200,66 @@
             <div>
               <p class="chapter-label">Chapter</p>
               <strong id="chapterTitle">Dawn on the Garden</strong>
+              <span class="reader-time" id="chapterTimeRemaining">About 4 min left</span>
             </div>
             <div class="page-meta">
               <span id="pageCounter">Page 1 of 2</span>
+              <span id="readerPercentage">0% read</span>
               <progress id="bookProgress" value="0" max="100"></progress>
+            </div>
+          </div>
+
+          <div class="reader-toolbar">
+            <button class="reader-settings-toggle" id="readerSettingsButton" type="button" aria-expanded="false" aria-controls="readerSettingsPanel">Reading settings</button>
+            <div class="reader-settings-panel hidden" id="readerSettingsPanel">
+              <label>
+                Font Size
+                <select id="fontSizeSelect">
+                  <option value="small">Small</option>
+                  <option value="medium">Medium</option>
+                  <option value="large">Large</option>
+                  <option value="xlarge">Extra Large</option>
+                </select>
+              </label>
+              <label>
+                Theme
+                <select id="themeSelect">
+                  <option value="light">Light</option>
+                  <option value="sepia">Sepia</option>
+                  <option value="dark">Dark</option>
+                </select>
+              </label>
+              <label>
+                Line Height
+                <select id="lineHeightSelect">
+                  <option value="compact">Compact</option>
+                  <option value="comfortable">Comfortable</option>
+                  <option value="spacious">Spacious</option>
+                </select>
+              </label>
+              <label>
+                Margins
+                <select id="marginSelect">
+                  <option value="narrow">Narrow</option>
+                  <option value="balanced">Balanced</option>
+                  <option value="wide">Wide</option>
+                </select>
+              </label>
             </div>
           </div>
 
           <div class="reader-story" id="readerText" tabindex="-1">
             <p>A cozy page of the story appears here.</p>
+          </div>
+
+          <div class="chapter-complete hidden" id="chapterComplete">
+            <span class="reader-tag">Chapter Complete</span>
+            <h3 id="completedChapterTitle">Moonlit Branches</h3>
+            <p id="completedTimeRead">Time Read: 4 minutes</p>
+            <div class="completion-actions">
+              <button class="reader-nav primary" id="continueChapterButton" type="button">Continue to Next Chapter</button>
+              <button class="reader-nav" id="returnLibraryButton" type="button">Return to Library</button>
+            </div>
           </div>
 
           <div class="reader-footer">
@@ -199,10 +270,53 @@
       </div>
     </div>
 
+    <div class="experience-overlay" id="setupOverlay" aria-hidden="true">
+      <section class="experience-card setup-card" role="dialog" aria-modal="true" aria-labelledby="setupTitle">
+        <span class="reader-tag">A quiet beginning</span>
+        <p class="step-count" id="setupStepCount">Step 1 of 4</p>
+        <h2 id="setupTitle">Create your reading PIN</h2>
+        <p class="experience-copy" id="setupCopy">Choose four digits you will remember.</p>
+        <div id="setupContent"></div>
+        <p class="form-message" id="setupMessage" aria-live="polite"></p>
+        <div class="experience-actions" id="setupActions"></div>
+      </section>
+    </div>
+
+    <div class="experience-overlay pin-overlay" id="pinOverlay" aria-hidden="true">
+      <section class="experience-card pin-card" role="dialog" aria-modal="true" aria-labelledby="pinTitle">
+        <span class="reader-tag">Between the pages</span>
+        <h2 id="pinTitle">The book is waiting</h2>
+        <p class="experience-copy">Enter your four-digit reading PIN.</p>
+        <input class="pin-input" id="pinInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off" aria-label="Four-digit PIN" />
+        <p class="form-message" id="pinMessage" aria-live="polite"></p>
+        <div class="experience-actions">
+          <button class="reader-nav" id="closePinButton" type="button">Return</button>
+          <button class="reader-nav primary" id="unlockButton" type="button">Open</button>
+        </div>
+      </section>
+    </div>
+
+    <div class="experience-overlay secret-overlay" id="secretOverlay" aria-hidden="true">
+      <section class="experience-card secret-card" role="dialog" aria-modal="true" aria-labelledby="secretTitle">
+        <button class="back-button" id="leaveSecretButton" type="button">← Close the book</button>
+        <div id="secretHome">
+          <span class="reader-tag">Private collection</span>
+          <h2 id="secretTitle">Between The Pages</h2>
+          <p class="experience-copy">A quiet room known only to you.</p>
+          <div class="secret-modules">
+            <button class="secret-module" type="button" data-secret-module="chat"><span>✦</span><strong>Chat</strong><small>Coming in a future chapter</small></button>
+            <button class="secret-module" type="button" data-secret-module="memories"><span>❀</span><strong>Memories</strong><small>A place for moments</small></button>
+            <button class="secret-module guide-module" type="button" data-secret-module="guide"><span>📚</span><strong>Library Guide</strong><small>Open the guidebook</small></button>
+          </div>
+        </div>
+        <div class="hidden" id="libraryGuide"></div>
+      </section>
+    </div>
+
     <div class="feedback-banner" id="feedbackBanner" aria-live="polite"></div>
   </div>
 
-  <script src="js/script.js"></script>
+  <script type="module" src="js/app.js"></script>
 </body>
 
 </html>
