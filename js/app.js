@@ -129,9 +129,14 @@ initializeSecretSpace();
 initializeLibraryGuide({
   onBack: showSecretHome,
   onChangeTrigger: () => {
-    document.getElementById("secretOverlay").classList.remove("open");
-    document.getElementById("secretOverlay").setAttribute("aria-hidden", "true");
-    openTriggerSetup(loadSecret().secret.auth.pinHash);
+    const configuration = loadSecret();
+    const pinHash = configuration?.secret?.auth?.pinHash;
+    if (!pinHash) {
+      showFeedback("Create Secret Space first.");
+      openSetupWizard();
+      return;
+    }
+    openTriggerSetup(pinHash);
   },
   onRestored: renderMyLibrary
 });

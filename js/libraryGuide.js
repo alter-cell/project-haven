@@ -1,6 +1,6 @@
 import { hashPin, isValidPin } from "./auth.js";
-import { backup, loadSecret, restore, saveSecret } from "./storage.js";
-import { getBook, getBuiltInBooks } from "./library.js";
+import { backup, loadLibrary, loadSecret, restore, saveSecret } from "./storage.js";
+import { getBook } from "./library.js";
 
 let host;
 let onBack = () => {};
@@ -67,7 +67,7 @@ export function openLibraryGuide() {
   changeTrigger.type = "button";
   changeTrigger.className = "reader-nav";
   changeTrigger.textContent = "Change Trigger";
-  changeTrigger.addEventListener("click", () => onChangeTrigger());
+  changeTrigger.addEventListener("click", onChangeTrigger);
   const changePin = document.createElement("button");
   changePin.type = "button";
   changePin.className = "reader-nav";

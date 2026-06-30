@@ -12,6 +12,9 @@ const state = {
   chapterId: "",
   pageIndex: 0,
   selected: null,
+  paragraphIndex: null,
+  wordIndex: null,
+  selectedWord: "",
   previewing: false
 };
 let elements;
@@ -48,6 +51,9 @@ const resetState = () => {
   state.chapterId = "";
   state.pageIndex = 0;
   state.selected = null;
+  state.paragraphIndex = null;
+  state.wordIndex = null;
+  state.selectedWord = "";
   state.previewing = false;
 };
 
@@ -63,7 +69,7 @@ export function openTriggerSetup(existingPinHash) {
   resetState();
   state.pinHash = existingPinHash;
   state.editMode = true;
-  state.step = 2;
+  state.step = 1;
   elements.overlay.classList.add("open");
   elements.overlay.setAttribute("aria-hidden", "false");
   document.body.classList.add("reader-open");
@@ -80,7 +86,7 @@ export function openTriggerAnimationTest() {
   state.chapterId = selected.chapterId;
   state.pageIndex = selected.pageIndex;
   state.selected = selected;
-  state.step = 5;
+  state.step = 4;
   elements.overlay.classList.add("open");
   elements.overlay.setAttribute("aria-hidden", "false");
   document.body.classList.add("reader-open");
@@ -94,17 +100,24 @@ export function openTriggerAnimationTest() {
 
 function render() {
   const totalSteps = state.editMode ? 4 : 6;
-  const stepLabel = state.editMode ? Math.min(state.step - 1, totalSteps) : Math.min(state.step, totalSteps);
+  const stepLabel = Math.min(state.step, totalSteps);
   elements.count.textContent = `Step ${stepLabel} of ${totalSteps}`;
   elements.content.replaceChildren();
   elements.actions.replaceChildren();
   elements.message.textContent = "";
-  if (state.step === 1) renderPin();
-  if (state.step === 2) renderBooks();
-  if (state.step === 3) renderChapters();
-  if (state.step === 4) renderReadChapter();
-  if (state.step === 5) renderChooseWord();
-  if (state.step === 6) renderConfirmation();
+  if (state.editMode) {
+    if (state.step === 1) renderBooks();
+    if (state.step === 2) renderChapters();
+    if (state.step === 3) renderPages();
+    if (state.step === 4) renderChooseWord();
+  } else {
+    if (state.step === 1) renderPin();
+    if (state.step === 2) renderBooks();
+    if (state.step === 3) renderChapters();
+    if (state.step === 4) renderReadChapter();
+    if (state.step === 5) renderChooseWord();
+    if (state.step === 6) renderConfirmation();
+  }
 }
 
 function renderPin() {
@@ -156,7 +169,7 @@ function renderBooks() {
       </div>`;
     card.addEventListener("click", () => {
       state.bookId = book.id;
-      state.step = 3;
+      state.step = state.editMode ? 2 : 3;
       render();
     });
     grid.append(card);
@@ -178,6 +191,34 @@ function renderChapters() {
     choice.addEventListener("click", () => {
       state.chapterId = chapter.id;
       state.pageIndex = 0;
+      state.step = state.editMode ? 3 : 4;
+      render();
+    });
+    list.append(choice);
+  });
+  const back = button("Back", "reader-nav");
+  back.addEventListener("click", () => {
+    state.step = 1;
+    render();
+  });
+  elements.content.append(list);
+  elements.actions.append(back);
+}
+
+function renderPages() {
+  const book = getBuiltInBooks().find((item) => item.id === state.bookId);
+  const chapter = book.chapters.find((item) => item.id === state.chapterId);
+  elements.title.textContent = "Choose a page";
+  elements.copy.textContent = "Open the page where your hidden doorway will live.";
+  const list = document.createElement("div");
+  list.className = "setup-choice-list";
+  chapter.pages.forEach((page, index) => {
+    const choice = document.createElement("button");
+    choice.type = "button";
+    choice.className = "chapter-item";
+    choice.innerHTML = `<strong>Page ${index + 1}</strong><span>${page.paragraphs.join(" ").slice(0, 90)}…</span>`;
+    choice.addEventListener("click", () => {
+      state.pageIndex = index;
       state.step = 4;
       render();
     });
@@ -185,13 +226,8 @@ function renderChapters() {
   });
   const back = button("Back", "reader-nav");
   back.addEventListener("click", () => {
-    if (state.editMode) {
-      state.step = 2;
-      render();
-    } else {
-      state.step = 1;
-      render();
-    }
+    state.step = 2;
+    render();
   });
   elements.content.append(list);
   elements.actions.append(back);
@@ -220,59 +256,49 @@ function renderReadChapter() {
 function renderChooseWord() {
   const book = getBuiltInBooks().find((item) => item.id === state.bookId);
   const chapter = book.chapters.find((item) => item.id === state.chapterId);
-  elements.title.textContent = state.testMode ? "Test Trigger Animation" : "Choose the trigger word";
-  elements.copy.textContent = state.testMode
-    ? "The saved trigger animation will play without changing your Secret Space."
+  elements.title.textContent = "Choose the trigger word";
+  elements.copy.textContent = state.editMode
+    ? "Tap the word on this page that will become your new Secret Space entrance."
     : "Every word on every page can become the entrance. Tap the one that feels right.";
-  const readerArea = createWizardReader(book, chapter, !state.testMode);
+  const readerArea = createWizardReader(book, chapter, true);
 
   const prompt = document.createElement("div");
   prompt.className = "setup-trigger-prompt";
   const message = document.createElement("p");
-  if (state.testMode) {
-    message.textContent = "Playing the current hidden doorway.";
-  } else if (!state.selected) {
-    message.textContent = "Tap a single word to see if it feels like the hidden door.";
+  if (!state.selected) {
+    message.textContent = state.editMode
+      ? "Select a word to mark your new trigger. Nothing is saved yet."
+      : "Tap a single word to see if it feels like the hidden door.";
   } else {
-    const selectionPage = state.selected.pageIndex + 1;
-    const currentPage = state.pageIndex + 1;
-    message.innerHTML = `Use <strong>“${state.selected.word}”</strong> as the entrance?`;
-    if (selectionPage !== currentPage) {
-      const note = document.createElement("small");
-      note.textContent = `This selection is on page ${selectionPage}. Navigate there to see it again.`;
-      message.append(document.createElement("br"), note);
-    }
+    message.innerHTML = `Selected <strong>“${state.selectedWord || state.selected?.word || state.selected?.selectedWord}”</strong>.`;
   }
   prompt.append(message);
-  if (state.selected && !state.testMode) {
-    const actions = document.createElement("div");
-    actions.className = "experience-actions";
-    const cancel = button("Cancel", "reader-nav");
-    const use = button("Use This Word");
-    cancel.addEventListener("click", () => {
-      state.selected = null;
-      render();
-    });
-    use.addEventListener("click", async () => {
-      await animateTriggerPreview();
-      state.step = 6;
-      render();
-    });
-    actions.append(cancel, use);
-    prompt.append(actions);
-  }
 
-  const previous = button("Previous", "reader-nav");
-  const next = button("Next page", "reader-nav");
-  previous.disabled = state.pageIndex === 0;
-  next.disabled = state.pageIndex === chapter.pages.length - 1;
-  previous.addEventListener("click", () => { state.pageIndex--; render(); });
-  next.addEventListener("click", () => { state.pageIndex++; render(); });
   const back = button("Back", "reader-nav");
-  back.addEventListener("click", () => { state.step = 4; render(); });
+const save = button(
+    state.editMode ? "Save Trigger" : "Continue"
+);
+
+save.disabled = !state.selected;
+
+save.addEventListener("click", async () => {
+    if (!state.selected) return;
+
+    if (state.editMode) {
+        await saveConfiguration();
+    } else {
+        state.step = 6;
+        render();
+    }
+});
+  
+  back.addEventListener("click", () => {
+    state.step = state.editMode ? 3 : 4;
+    render();
+  });
 
   elements.content.append(readerArea, prompt);
-  if (!state.testMode) elements.actions.append(previous, next, back);
+  elements.actions.append(back, save);
 }
 
 function renderConfirmation() {
@@ -320,27 +346,40 @@ function createWizardReader(book, chapter, selectable) {
   pageWrapper.className = "reader-story setup-reader-story";
   pageWrapper.tabIndex = -1;
   pageWrapper.style.position = "relative";
+  pageWrapper.style.userSelect = "none";
+  pageWrapper.style.webkitUserSelect = "none";
 
   page.paragraphs.forEach((paragraph, paragraphIndex) => {
     const paragraphElement = document.createElement("p");
-    paragraph.trim().split(/\s+/).forEach((word, wordIndex) => {
-      if (wordIndex) paragraphElement.append(" ");
+    const tokens = paragraph.match(/\S+|\s+/g) || [];
+    let wordIndex = 0;
+    tokens.forEach((token) => {
+      if (/^\s+$/.test(token)) {
+        paragraphElement.append(document.createTextNode(token));
+        return;
+      }
       const wordElement = document.createElement("span");
       wordElement.className = "reader-word setup-reader-word";
-      wordElement.textContent = word;
+      wordElement.textContent = token;
       if (selectable) {
+        const currentWordIndex = wordIndex;
         wordElement.classList.add("selectable-word");
         wordElement.tabIndex = 0;
         wordElement.setAttribute("role", "button");
-        wordElement.addEventListener("click", () => selectTriggerWord(page, paragraphIndex, wordIndex, word));
+        wordElement.addEventListener("pointerdown", (event) => event.preventDefault());
+        wordElement.addEventListener("click", () => selectTriggerWord(page, paragraphIndex, currentWordIndex, token));
         wordElement.addEventListener("keydown", (event) => {
-          if (event.key === "Enter") selectTriggerWord(page, paragraphIndex, wordIndex, word);
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            selectTriggerWord(page, paragraphIndex, currentWordIndex, token);
+          }
         });
       }
       if (state.selected && state.selected.pageId === page.id && state.selected.paragraphIndex === paragraphIndex && state.selected.wordIndex === wordIndex) {
         wordElement.classList.add("selected-trigger-word");
       }
       paragraphElement.append(wordElement);
+      wordIndex += 1;
     });
     pageWrapper.append(paragraphElement);
   });
@@ -357,9 +396,13 @@ function selectTriggerWord(page, paragraphIndex, wordIndex, word) {
     pageId: page.id,
     paragraphIndex,
     wordIndex,
+    selectedWord: word,
     word,
     pageIndex: state.pageIndex
   };
+  state.paragraphIndex = paragraphIndex;
+  state.wordIndex = wordIndex;
+  state.selectedWord = word;
   render();
 }
 
