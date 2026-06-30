@@ -1,3 +1,23 @@
+import { supabase } from "./services/supabaseClient.js";
+
+async function testInsert() {
+  const { data, error } = await supabase
+    .from("profiles")
+    .insert([
+      {
+        username: "Alter",
+      },
+    ])
+    .select();
+
+  console.log(data);
+  console.log(error);
+}
+
+testInsert();
+
+
+
 import { getBook, importBook } from "./library.js";
 import { DEV_MODE } from "./config.js";
 import { initializeLibraryGuide } from "./libraryGuide.js";
@@ -161,3 +181,5 @@ window.addEventListener("scroll", () => {
 }, { passive: true });
 
 if (!loadSecret()) openSetupWizard();
+
+
