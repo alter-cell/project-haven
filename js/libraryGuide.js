@@ -1,5 +1,6 @@
 import { hashPin, isValidPin } from "./auth.js";
 import { backup, loadSecret, restore, saveSecret } from "./storage.js";
+import { getBook, getBuiltInBooks } from "./library.js";
 
 let host;
 let onBack = () => {};
@@ -32,11 +33,57 @@ export function openLibraryGuide() {
   back.addEventListener("click", onBack);
   const heading = document.createElement("div");
   heading.innerHTML = `<span class="reader-tag">Reference volume</span><h2>Library Guide</h2><p class="experience-copy">Useful chapters for caring for your private collection.</p>`;
+  const secret = loadSecret();
+  const secretPanel = document.createElement("section");
+  secretPanel.className = "guide-secret-panel";
+  const trigger = secret?.secret?.trigger;
+  const enabled = secret?.secret?.enabled;
+  let bookTitle = "—";
+  let chapterTitle = "—";
+  let pageNumber = "—";
+  let triggerWord = "—";
+  if (trigger) {
+    const book = getBook(trigger.bookId);
+    bookTitle = book?.title || trigger.bookId;
+    const chapter = book?.chapters.find((item) => item.id === trigger.chapterId);
+    chapterTitle = chapter?.title || trigger.chapterId;
+    const pageIndex = chapter?.pages.findIndex((page) => page.id === trigger.pageId);
+    pageNumber = pageIndex >= 0 ? pageIndex + 1 : trigger.pageId;
+    triggerWord = chapter?.pages[pageIndex]?.paragraphs?.[trigger.paragraphIndex]?.split(/\s+/)?.[trigger.wordIndex] || "selected word";
+  }
+  secretPanel.innerHTML = `
+    <span class="reader-tag">Secret Space</span>
+    <h3>Current trigger</h3>
+    <dl>
+      <div><dt>Book</dt><dd>${bookTitle}</dd></div>
+      <div><dt>Chapter</dt><dd>${chapterTitle}</dd></div>
+      <div><dt>Page</dt><dd>${pageNumber}</dd></div>
+      <div><dt>Trigger word</dt><dd>${trigger ? `“${triggerWord}”` : "—"}</dd></div>
+      <div><dt>Status</dt><dd>${enabled ? "Enabled" : "Disabled"}</dd></div>
+    </dl>`;
+  const secretActions = document.createElement("div");
+  secretActions.className = "experience-actions guide-secret-actions";
+  const changeTrigger = document.createElement("button");
+  changeTrigger.type = "button";
+  changeTrigger.className = "reader-nav";
+  changeTrigger.textContent = "Change Trigger";
+  changeTrigger.addEventListener("click", () => onChangeTrigger());
+  const changePin = document.createElement("button");
+  changePin.type = "button";
+  changePin.className = "reader-nav";
+  changePin.textContent = "Change PIN";
+  changePin.addEventListener("click", renderChangePin);
+  const disable = document.createElement("button");
+  disable.type = "button";
+  disable.className = "reader-nav";
+  disable.textContent = enabled ? "Disable Secret Space" : "Enable Secret Space";
+  disable.addEventListener("click", () => toggleSecretSpace(!enabled));
+  secretActions.append(changeTrigger, changePin, disable);
+  secretPanel.append(secretActions);
+
   const pages = document.createElement("div");
   pages.className = "guide-pages";
   pages.append(
-    guideButton("Change PIN", "Set a new four-digit reading PIN.", renderChangePin),
-    guideButton("Change Secret Trigger", "Choose a new built-in page and word position.", onChangeTrigger),
     guideButton("Backup", "Download configuration, progress, and shelf metadata.", downloadBackup),
     guideButton("Restore", "Restore from a Petal Pages backup.", chooseRestore),
     guideButton("Future Settings", "More guide chapters will be added later.", () => showGuideMessage("This chapter has not been written yet."))
@@ -44,7 +91,15 @@ export function openLibraryGuide() {
   const message = document.createElement("p");
   message.id = "guideMessage";
   message.className = "form-message";
-  host.append(back, heading, pages, message);
+  host.append(back, heading, secretPanel, pages, message);
+}
+
+function toggleSecretSpace(enable) {
+  const configuration = loadSecret() || { secret: { enabled: false, trigger: null, auth: { pinHash: "" } } };
+  configuration.secret.enabled = enable;
+  saveSecret(configuration);
+  openLibraryGuide();
+  showGuideMessage(enable ? "Secret Space has been enabled." : "Secret Space has been disabled.");
 }
 
 function showGuideMessage(message) {

@@ -17,6 +17,7 @@ const write = (key, value) => localStorage.setItem(key, JSON.stringify(value));
 
 export const loadSecret = () => read(KEYS.secret, null);
 export const saveSecret = (configuration) => write(KEYS.secret, configuration);
+export const deleteSecret = () => localStorage.removeItem(KEYS.secret);
 export const loadProgress = () => read(KEYS.progress, {});
 export const saveProgress = (progress) => write(KEYS.progress, progress);
 export const loadLibrary = () => read(KEYS.library, []);

@@ -1,10 +1,11 @@
 import { getBook, importBook } from "./library.js";
+import { DEV_MODE } from "./config.js";
 import { initializeLibraryGuide } from "./libraryGuide.js";
 import { fadeReaderForSecret, initializeReader, openBook } from "./reader.js";
 import { registerRoute } from "./router.js";
 import { initializeSecretSpace, openPinScreen, showSecretHome } from "./secretSpace.js";
-import { initializeSetupWizard, openSetupWizard, openTriggerSetup } from "./setupWizard.js";
-import { loadLibrary, loadSecret } from "./storage.js";
+import { initializeSetupWizard, openSetupWizard, openTriggerAnimationTest, openTriggerSetup } from "./setupWizard.js";
+import { deleteSecret, loadLibrary, loadSecret } from "./storage.js";
 
 const feedback = document.getElementById("feedbackBanner");
 const search = document.getElementById("searchInput");
@@ -13,6 +14,10 @@ const searchCard = document.getElementById("searchCard");
 const fileInput = document.getElementById("bookFileInput");
 const myLibraryBooks = document.getElementById("myLibraryBooks");
 const emptyShelf = document.getElementById("emptyShelfMessage");
+const developerTools = document.getElementById("developerTools");
+const changeSecretTriggerButton = document.getElementById("changeSecretTriggerButton");
+const resetSecretSetupButton = document.getElementById("resetSecretSetupButton");
+const testTriggerAnimationButton = document.getElementById("testTriggerAnimationButton");
 
 function showFeedback(message) {
   feedback.textContent = message;
@@ -90,6 +95,34 @@ function revealPinScreen() {
   setTimeout(openPinScreen, 430);
 }
 
+function openDeveloperTriggerSetup() {
+  const configuration = loadSecret();
+  const pinHash = configuration?.secret?.auth?.pinHash;
+  if (!pinHash) {
+    showFeedback("Create Secret Space first.");
+    openSetupWizard();
+    return;
+  }
+  openTriggerSetup(pinHash);
+}
+
+function resetDeveloperSecretSetup() {
+  deleteSecret();
+  openSetupWizard();
+}
+
+function testDeveloperTriggerAnimation() {
+  if (!openTriggerAnimationTest()) showFeedback("Choose a secret trigger first.");
+}
+
+function initializeDeveloperTools() {
+  if (!DEV_MODE) return;
+  developerTools.classList.remove("hidden");
+  changeSecretTriggerButton.addEventListener("click", openDeveloperTriggerSetup);
+  resetSecretSetupButton.addEventListener("click", resetDeveloperSecretSetup);
+  testTriggerAnimationButton.addEventListener("click", testDeveloperTriggerAnimation);
+}
+
 initializeReader({ onSecretTrigger: revealPinScreen });
 initializeSetupWizard({ onComplete: () => showFeedback("Your library is ready.") });
 initializeSecretSpace();
@@ -107,6 +140,7 @@ registerRoute("library", () => {});
 registerRoute("reader", ({ bookId }) => openBook(bookId));
 bindBookButtons();
 renderMyLibrary();
+initializeDeveloperTools();
 
 document.getElementById("addToShelfButton").addEventListener("click", () => fileInput.click());
 fileInput.addEventListener("change", handleImports);

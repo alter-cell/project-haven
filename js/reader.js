@@ -269,19 +269,27 @@ function renderWords(page) {
   elements.text.replaceChildren();
   page.paragraphs.forEach((paragraph, paragraphIndex) => {
     const paragraphElement = document.createElement("p");
-    paragraph.trim().split(/\s+/).forEach((word, wordIndex) => {
-      if (wordIndex) paragraphElement.append(" ");
+    const tokens = paragraph.match(/\S+|\s+/g) || [];
+    let wordIndex = 0;
+    tokens.forEach((token) => {
+      if (/^\s+$/.test(token)) {
+        paragraphElement.append(document.createTextNode(token));
+        return;
+      }
       const wordElement = document.createElement("span");
+      const paragraphWordIndex = wordIndex;
       wordElement.className = "reader-word";
-      wordElement.textContent = word;
+      wordElement.textContent = token;
+      wordElement.addEventListener("pointerdown", (event) => event.preventDefault());
       wordElement.addEventListener("click", () => checkTrigger({
         bookId: activeBook.id,
         chapterId: getChapter().id,
         pageId: page.id,
         paragraphIndex,
-        wordIndex
+        wordIndex: paragraphWordIndex
       }, loadSecret(), onSecretTrigger));
       paragraphElement.append(wordElement);
+      wordIndex += 1;
     });
     elements.text.append(paragraphElement);
   });
