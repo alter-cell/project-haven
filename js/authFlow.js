@@ -102,6 +102,31 @@ function validateSignupForm() {
   return valid;
 }
 
+function validateSigninForm() {
+  const email = document.getElementById("signinEmail")?.value.trim() || "";
+  const password = document.getElementById("signinPassword")?.value || "";
+  let valid = true;
+
+  if (!email) {
+    setFieldMessage("signinEmailMessage", "Please enter your email address.");
+    valid = false;
+  } else if (!validateEmail(email)) {
+    setFieldMessage("signinEmailMessage", "Enter a valid email address.");
+    valid = false;
+  } else {
+    setFieldMessage("signinEmailMessage", "");
+  }
+
+  if (!password) {
+    setFieldMessage("signinPasswordMessage", "Please enter your password.");
+    valid = false;
+  } else {
+    setFieldMessage("signinPasswordMessage", "");
+  }
+
+  return valid;
+}
+
 export function initializeIdentityFlow() {
   const overlay = getIdentityOverlay();
   if (!overlay) return;
@@ -148,6 +173,14 @@ export function initializeIdentityFlow() {
     const button = document.getElementById("createIdentityButton");
     button.disabled = !validateSignupForm();
   });
+  document.getElementById("signinEmail")?.addEventListener("input", () => {
+    const button = document.getElementById("signInButton");
+    button.disabled = !validateSigninForm();
+  });
+  document.getElementById("signinPassword")?.addEventListener("input", () => {
+    const button = document.getElementById("signInButton");
+    button.disabled = !validateSigninForm();
+  });
   document.getElementById("signupEmail")?.addEventListener("input", () => {
     const button = document.getElementById("createIdentityButton");
     button.disabled = !validateSignupForm();
@@ -183,15 +216,23 @@ export function initializeIdentityFlow() {
   document.getElementById("identitySigninView")?.addEventListener("submit", async (event) => {
     event.preventDefault();
     const button = document.getElementById("signInButton");
+    if (!validateSigninForm()) return;
     button.disabled = true;
     button.textContent = "Signing in...";
     try {
       const { signIn } = await import("./services/authService.js");
-      const { error } = await signIn(document.getElementById("signinEmail").value.trim(), document.getElementById("signinPassword").value);
+      const { data, error } = await signIn(document.getElementById("signinEmail").value.trim(), document.getElementById("signinPassword").value);
       if (error) throw error;
+      if (!data?.user) throw new Error("Invalid credentials");
       await completeIdentityFlow();
     } catch (error) {
-      setFieldMessage("signinEmailMessage", error?.message || "We could not sign you in right now.");
+      const message = error?.message || "We could not sign you in right now.";
+      const friendly = message.toLowerCase().includes("network")
+        ? "We could not reach the network. Please try again."
+        : message.toLowerCase().includes("invalid") || message.toLowerCase().includes("credentials")
+          ? "Those credentials do not match an existing identity."
+          : "We could not sign you in right now.";
+      setFieldMessage("signinPasswordMessage", friendly);
       button.disabled = false;
       button.textContent = "Sign In";
     }
