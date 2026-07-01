@@ -5,8 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Petal Pages</title>
-  <script type="module" crossorigin src="/assets/index-4oA17820.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-CecW_zEO.css">
+  <script type="module" crossorigin src="/assets/index-CpzTLeEd.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DJGs4by1.css">
 </head>
 
 <body>
@@ -327,6 +327,44 @@
           </div>
         </div>
         <div class="hidden" id="libraryGuide"></div>
+      </section>
+    </div>
+
+    <div class="experience-overlay" id="identityOverlay" aria-hidden="true">
+      <section class="experience-card identity-card" role="dialog" aria-modal="true" aria-labelledby="identityTitle">
+        <button class="reader-nav identity-back" id="identityBackButton" type="button">← Back</button>
+        <div class="identity-card__content">
+          <span class="reader-tag">Between The Pages</span>
+          <h2 id="identityTitle">Create Your Identity</h2>
+          <p class="experience-copy identity-copy">Keep your Between The Pages safe. Sync your library across devices and unlock conversations inside Between The Pages.</p>
+
+          <div class="identity-actions" role="group" aria-label="Authentication options">
+            <button class="reader-nav primary identity-button" id="continueWithGoogleButton" type="button">
+              <span class="identity-button__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path fill="#fff" d="M21.6 12.23c0-.72-.06-1.41-.17-2.08H12v3.94h5.39a4.6 4.6 0 0 1-2 3.02v2.49h3.24c1.9-1.75 2.97-4.33 2.97-7.37Z"/>
+                  <path fill="#fff" d="M12 22c2.7 0 4.96-.9 6.61-2.43l-3.24-2.49c-.9.6-2.05.96-3.37.96-2.59 0-4.79-1.74-5.58-4.09H3.07v2.57A10 10 0 0 0 12 22Z"/>
+                  <path fill="#fff" d="M6.42 13.95A6.02 6.02 0 0 1 6.42 10.05V7.48H3.07a10 10 0 0 0 0 12.94l3.35-2.57Z"/>
+                  <path fill="#fff" d="M12 6.04c1.46 0 2.78.5 3.82 1.49l2.86-2.86A9.98 9.98 0 0 0 3.07 7.48l3.35 2.57C7.21 7.78 9.41 6.04 12 6.04Z"/>
+                </svg>
+              </span>
+              <span>Continue with Google</span>
+            </button>
+
+            <button class="reader-nav identity-button identity-button--secondary" id="continueWithEmailButton" type="button">Continue with Email</button>
+          </div>
+
+          <div class="identity-divider" aria-hidden="true">
+            <span></span>
+            <span>or</span>
+            <span></span>
+          </div>
+
+          <p class="identity-signin">
+            Already have an identity?
+            <a class="identity-link" id="identitySignInLink" href="#">Sign In <span aria-hidden="true">→</span></a>
+          </p>
+        </div>
       </section>
     </div>
 

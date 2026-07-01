@@ -3,6 +3,7 @@ import { chatModule } from "./chat.js";
 import { memoriesModule } from "./gallery.js";
 import { openLibraryGuide } from "./libraryGuide.js";
 import { openAccountScreen, hideAccountScreen } from "./account.js";
+import { setPendingDestination, showIdentityScreen, hideIdentityScreen, isAuthenticated } from "./authFlow.js";
 import { loadSecret } from "./storage.js";
 
 let elements;
@@ -64,21 +65,35 @@ function openModule(name) {
   if (name === "guide") {
     elements.secretHome.classList.add("hidden");
     hideAccountScreen();
+    hideIdentityScreen();
     openLibraryGuide();
     return;
   }
   if (name === "account") {
+    if (!isAuthenticated()) {
+      setPendingDestination("account");
+      showIdentityScreen("account");
+      return;
+    }
     elements.secretHome.classList.add("hidden");
+    hideIdentityScreen();
     openAccountScreen();
     return;
   }
   const module = name === "chat" ? chatModule : memoriesModule;
+  if (!isAuthenticated()) {
+    const destination = name === "chat" ? "chat" : "memories";
+    setPendingDestination(destination);
+    showIdentityScreen(destination);
+    return;
+  }
   window.dispatchEvent(new CustomEvent("petal:feedback", { detail: `${module.title}: ${module.description}` }));
 }
 
 export function showSecretHome() {
   elements.guide.classList.add("hidden");
   hideAccountScreen();
+  hideIdentityScreen();
   elements.secretHome.classList.remove("hidden");
 }
 

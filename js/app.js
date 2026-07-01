@@ -5,7 +5,8 @@ import { fadeReaderForSecret, initializeReader, openBook } from "./reader.js";
 import { registerRoute } from "./router.js";
 import { initializeSecretSpace, openPinScreen, showSecretHome } from "./secretSpace.js";
 import { initializeSetupWizard, openSetupWizard, openTriggerAnimationTest, openTriggerSetup } from "./setupWizard.js";
-import { initializeAccountModule } from "./account.js";
+import { initializeAccountModule, openAccountScreen } from "./account.js";
+import { initializeIdentityFlow, clearPendingDestination } from "./authFlow.js";
 import { deleteSecret, loadLibrary, loadSecret } from "./storage.js";
 
 const feedback = document.getElementById("feedbackBanner");
@@ -128,6 +129,7 @@ initializeReader({ onSecretTrigger: revealPinScreen });
 initializeSetupWizard({ onComplete: () => showFeedback("Your library is ready.") });
 initializeSecretSpace();
 initializeAccountModule();
+initializeIdentityFlow();
 initializeLibraryGuide({
   onBack: showSecretHome,
   onChangeTrigger: () => {
@@ -157,6 +159,19 @@ search.addEventListener("keydown", (event) => {
   if (event.key === "Enter") runSearch();
 });
 window.addEventListener("petal:feedback", (event) => showFeedback(event.detail));
+window.addEventListener("petal:auth-complete", async (event) => {
+  const destination = event.detail;
+  if (destination === "chat") {
+    showSecretHome();
+    showFeedback("Chat is ready to open.");
+  } else if (destination === "memories") {
+    showSecretHome();
+    showFeedback("Memories is ready to open.");
+  } else if (destination === "account") {
+    await openAccountScreen();
+  }
+  clearPendingDestination();
+});
 window.addEventListener("scroll", () => {
   const modalOpen = document.querySelector(".experience-overlay.open, .reader-overlay.open");
   searchCard.classList.toggle("pill-mode", window.scrollY > 120 && !modalOpen);
