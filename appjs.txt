@@ -1,3 +1,14 @@
+import { signUp } from "./services/authService.js";
+
+const { data, error } = await signUp(
+  "alter@test.com",
+  "12345678"
+);
+
+console.log(data);
+console.log(error);
+
+
 import { getBook, importBook } from "./library.js";
 import { DEV_MODE } from "./config.js";
 import { initializeLibraryGuide } from "./libraryGuide.js";
@@ -5,7 +16,6 @@ import { fadeReaderForSecret, initializeReader, openBook } from "./reader.js";
 import { registerRoute } from "./router.js";
 import { initializeSecretSpace, openPinScreen, showSecretHome } from "./secretSpace.js";
 import { initializeSetupWizard, openSetupWizard, openTriggerAnimationTest, openTriggerSetup } from "./setupWizard.js";
-import { initializeAccountModule } from "./account.js";
 import { deleteSecret, loadLibrary, loadSecret } from "./storage.js";
 
 const feedback = document.getElementById("feedbackBanner");
@@ -127,7 +137,6 @@ function initializeDeveloperTools() {
 initializeReader({ onSecretTrigger: revealPinScreen });
 initializeSetupWizard({ onComplete: () => showFeedback("Your library is ready.") });
 initializeSecretSpace();
-initializeAccountModule();
 initializeLibraryGuide({
   onBack: showSecretHome,
   onChangeTrigger: () => {

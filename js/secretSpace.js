@@ -2,6 +2,7 @@ import { verifyPin } from "./auth.js";
 import { chatModule } from "./chat.js";
 import { memoriesModule } from "./gallery.js";
 import { openLibraryGuide } from "./libraryGuide.js";
+import { openAccountScreen, hideAccountScreen } from "./account.js";
 import { loadSecret } from "./storage.js";
 
 let elements;
@@ -62,7 +63,13 @@ async function unlock() {
 function openModule(name) {
   if (name === "guide") {
     elements.secretHome.classList.add("hidden");
+    hideAccountScreen();
     openLibraryGuide();
+    return;
+  }
+  if (name === "account") {
+    elements.secretHome.classList.add("hidden");
+    openAccountScreen();
     return;
   }
   const module = name === "chat" ? chatModule : memoriesModule;
@@ -71,6 +78,7 @@ function openModule(name) {
 
 export function showSecretHome() {
   elements.guide.classList.add("hidden");
+  hideAccountScreen();
   elements.secretHome.classList.remove("hidden");
 }
 
